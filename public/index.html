@@ -1,19 +1,18 @@
-<!-- This was mainly written on a train from Vancouver, Canada to Portland, don't use this
-  as a guide for writing code -->
 <!DOCTYPE html>
 <html manifest="yapcasia2013.appcache">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>YAPC::Asia 2013</title>
+  <title>YAPC::Asia</title>
   <link rel="stylesheet" href="jquery.mobile.custom.structure.min.css">
   <link rel="stylesheet" href="jquery.mobile.custom.theme.min.css">
   <link rel="stylesheet" href="custom.css">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
 </head>
 <body>
   <div data-role="page" id="home">
     <div data-role="header" data-id="main-nav" data-position="fixed">
-      <h1>YAPC::Asia 2013</h1>
+      <h1>YAPC::Asia</h1>
     </div>
     <div data-role="header">
       <div data-role="navbar" style="overflow:hidden;">
@@ -55,7 +54,7 @@
     <div data-role="page" id="{{ talk.uid }}" class="session-page">
       <div data-role="header" data-id="main-nav" data-position="fixed" style="overflow:hidden;">
         <a data-role="button" data-theme="a" data-rel="back" href="#home" data-icon="arrow-l" class="ui-btn-left">Back</a>
-        <h1>YAPC::Asia 2013 - {{talk.title}}</h1>
+        <h1>YAPC::Asia</h1>
       </div>
       <div data-role="content">
         <h4>{{starting_at}} - {{ending_at}}</h4>
