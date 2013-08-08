@@ -1,32 +1,27 @@
 <!-- This was mainly written on a train from Vancouver, Canada to Portland, don't use this
   as a guide for writing code -->
 <!DOCTYPE html>
-<html manifest="railsconf2013.appcache">
+<!-- html manifest="railsconf2013.appcache"-->
+<html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RailsConf 2013</title>
+  <title>YAPC::Asia 2013</title>
   <link rel="stylesheet" href="jquery.mobile.custom.structure.min.css">
   <link rel="stylesheet" href="jquery.mobile.custom.theme.min.css">
   <link rel="stylesheet" href="custom.css">
-  <script>
-   if(window.location.hostname == "caliper-io.github.io" && window.location.pathname !== "/railsconf2013/"){
-     window.location.href = "http://caliper-io.github.io/railsconf2013/";
-   }
-  </script>
 </head>
 <body>
   <div data-role="page" id="home">
     <div data-role="header" data-id="main-nav" data-position="fixed">
-      <h1>RailsConf 2013</h1>
+      <h1>YAPC::Asia 2013</h1>
     </div>
     <div data-role="header">
       <div data-role="navbar" style="overflow:hidden;">
         <ul>
-          <li><a href="#" onClick="renderDayList(29);">Mon 4/29</a></li>
-          <li><a href="#" onClick="renderDayList(30);">Tue 4/30</a></li>
-          <li><a href="#" class="ui-btn-active" onClick="renderDayList(1);">Wed 5/1</a></li>
-          <li><a href="#" onClick="renderDayList(2);">Thu 5/2</a></li>
+          <li><a href="#" onClick="renderDayList(19);">Thu 9/19</a></li>
+          <li><a href="#" class="ui-btn-active" onClick="renderDayList(20);">Fri 9/20</a></li>
+          <li><a href="#" onClick="renderDayList(21);">Sat 9/21</a></li>
         </ul>
       </div>
     </div>
@@ -36,7 +31,7 @@
     </div>
     <div data-role="footer" class="our-footer">
       <a href="http://github.com/caliper-io/railsconf2013" target="_blank">
-        Brought to you with love from Vancouver via Amtrak 513.
+        Based on Railconf offline calendar by Caliper.io
       </a>
     </div>
   </div>
@@ -61,7 +56,7 @@
     <div data-role="page" id="{{ talk.uid }}" class="session-page">
       <div data-role="header" data-id="main-nav" data-position="fixed" style="overflow:hidden;">
         <a data-role="button" data-theme="a" data-rel="back" href="#home" data-icon="arrow-l" class="ui-btn-left">Back</a>
-        <h1>RailsConf 2013</h1>
+        <h1>YAPC::Asia 2013 - {{talk.title}}</h1>
       </div>
       <div data-role="content">
         <h4>{{starting_at}} - {{ending_at}}</h4>
@@ -73,14 +68,14 @@
           {{{ talk.description  }}}
         </div>
 
-        <div>
+        <!-- div>
           <h3>About the speaker</h3>
           {{{ talk.speaker.description }}}
-        </div>
+        </div -->
       </div>
       <div data-role="footer" class="our-footer">
         <a href="http://github.com/caliper-io/railsconf2013" target="_blank">
-          Brought to you with love from Vancouver via Amtrak 513.
+          Based on Railconf offline calendar by Caliper.io
         </a>
       </div>
     </div>
@@ -141,6 +136,11 @@
       saveStared();
     };
 
+    var parseDate = function(epoch){
+      // HATE JS DATES, create UTC 9 hours later to represent JST+9
+      return new Date(epoch + 9*60*60*1000);
+    }
+
     var renderDayList = function(day) {
       $("#talks").empty();
 
@@ -150,19 +150,19 @@
         obj.stared = getStared()[obj.uid];
 
         // only draw those for the selected date (Day)
-        var s = new Date(obj.starting_at);
-        if (s.getDate() != day) {
+        var s = parseDate(obj.starting_at);
+        if (s.getUTCDate() != day) {
           return true;
         }
         // check if we need a time divider
-        if (timerange == undefined || timerange != obj.starting_at) {
-          var s = new Date(obj.starting_at).toString();
-          var e = new Date(obj.ending_at).toString();
+        if (timerange == undefined || timerange != obj.starting_at + obj.ending_at) {
+          var s = parseDate(obj.starting_at).toUTCString();
+          var e = parseDate(obj.ending_at).toUTCString();
           $("#talks").append(talkDividerExample({
             starting_at: s.match(/2013 (\d{2}:\d{2})/)[1],
             ending_at: e.match(/2013 (\d{2}:\d{2})/)[1]
           }));
-          timerange = obj.starting_at;
+          timerange = obj.starting_at + obj.ending_at;
         }
         // Add talk information
         $("#talks").append(entryListTemplate(obj));
@@ -172,8 +172,8 @@
 
     var renderSessionDetailsPages = function() {
       $.each(schedule, function(i, talk) {
-        var s = new Date(talk.starting_at).toString();
-        var e = new Date(talk.ending_at).toString();
+        var s = parseDate(talk.starting_at).toUTCString();
+        var e = parseDate(talk.ending_at).toUTCString();
         var toRender = sessionDetailsTemplate({
             starting_at: s.match(/2013 (\d{2}:\d{2})/)[1],
             ending_at: e.match(/2013 (\d{2}:\d{2})/)[1],
@@ -187,7 +187,7 @@
     $(document).ready(function() {
       new FastClick(document.body);
 
-      renderDayList(1);
+      renderDayList(19);
       renderSessionDetailsPages();
 
 
