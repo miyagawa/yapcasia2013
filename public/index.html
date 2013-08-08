@@ -84,9 +84,31 @@
   <script src="jquery.mobile.custom.min.js"></script>
   <script src="handlebars-1.0.0.rc.2.js"></script>
   <script src="fastclick.min.js"></script>
+  <script src="moment.min.js"></script>
+  <script src="moment-timezone.min.js"></script>
   <script src="data/schedule.js"></script>
 
   <script type="text/javascript">
+    moment.tz.add({
+      "zones": {
+          "Asia/Tokyo": [
+              "9:18:59 - LMT 1887_11_31_15",
+              "9 - JST 1896 9",
+              "9 - CJT 1938 9",
+              "9 Japan J%sT"
+          ]
+      },
+      "rules": {
+          "Japan": [
+              "1948 1948 4 1 0 2 0 1 D",
+              "1948 1951 8 8 6 2 0 0 S",
+              "1949 1949 3 1 0 2 0 1 D",
+              "1950 1951 4 1 0 2 0 1 D"
+          ]
+      },
+      "links": {}
+    });
+
     var entryListTemplate = Handlebars.compile($("#entry-list-template").html());
     var talkDividerExample = Handlebars.compile($("#talk-divider-template").html());
     var sessionDetailsTemplate = Handlebars.compile($("#session-details-template").html());
@@ -135,10 +157,9 @@
       saveStared();
     };
 
-    var parseDate = function(epoch){
-      // HATE JS DATES, create UTC 9 hours later to represent JST+9
-      return new Date(epoch + 9*60*60*1000);
-    }
+    var jmoment = function(s){
+      return moment(s).tz("Asia/Tokyo");
+    };
 
     var renderDayList = function(day) {
       $("#talks").empty();
@@ -149,17 +170,16 @@
         obj.stared = getStared()[obj.uid];
 
         // only draw those for the selected date (Day)
-        var s = parseDate(obj.starting_at);
-        if (s.getUTCDate() != day) {
+        var s = jmoment(obj.starting_at);
+        if (s.date() != day) {
           return true;
         }
         // check if we need a time divider
         if (timerange == undefined || timerange != obj.starting_at + obj.ending_at) {
-          var s = parseDate(obj.starting_at).toUTCString();
-          var e = parseDate(obj.ending_at).toUTCString();
+          var e = jmoment(obj.ending_at);
           $("#talks").append(talkDividerExample({
-            starting_at: s.match(/2013 (\d{2}:\d{2})/)[1],
-            ending_at: e.match(/2013 (\d{2}:\d{2})/)[1]
+            starting_at: s.format('HH:mm'),
+            ending_at: e.format('HH:mm')
           }));
           timerange = obj.starting_at + obj.ending_at;
         }
@@ -171,11 +191,11 @@
 
     var renderSessionDetailsPages = function() {
       $.each(schedule, function(i, talk) {
-        var s = parseDate(talk.starting_at).toUTCString();
-        var e = parseDate(talk.ending_at).toUTCString();
+        var s = jmoment(talk.starting_at);
+        var e = jmoment(talk.ending_at);
         var toRender = sessionDetailsTemplate({
-            starting_at: s.match(/2013 (\d{2}:\d{2})/)[1],
-            ending_at: e.match(/2013 (\d{2}:\d{2})/)[1],
+            starting_at: s.format('HH:mm'),
+            ending_at: e.format('HH:mm'),
             talk: talk
           });
 

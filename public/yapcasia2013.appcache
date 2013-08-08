@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# v1 - 2013-08-07 18:42
+# v1 - 2013-08-07 20:49
 index.html
 jquery.mobile.custom.structure.min.css
 jquery.mobile.custom.theme.min.css
@@ -8,6 +8,8 @@ jquery-1.9.1.min.js
 jquery.mobile.custom.min.js
 fastclick.min.js
 handlebars-1.0.0.rc.2.js
+moment-timezone.min.js
+moment.min.js
 data/schedule.js
 images/ajax-loader.gif
 images/icons-18-white.png
