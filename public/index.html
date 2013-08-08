@@ -18,9 +18,9 @@
     <div data-role="header">
       <div data-role="navbar" style="overflow:hidden;">
         <ul>
-          <li><a href="#" class="ui-btn-active" onClick="renderDayList(19);">Thu 9/19</a></li>
-          <li><a href="#" onClick="renderDayList(20);">Fri 9/20</a></li>
-          <li><a href="#" onClick="renderDayList(21);">Sat 9/21</a></li>
+          <li><a href="#" class="day-19" onClick="renderDayList(19);">Thu 9/19</a></li>
+          <li><a href="#" class="day-20" onClick="renderDayList(20);">Fri 9/20</a></li>
+          <li><a href="#" class="day-21" onClick="renderDayList(21);">Sat 9/21</a></li>
         </ul>
       </div>
     </div>
@@ -206,9 +206,21 @@
     $(document).ready(function() {
       new FastClick(document.body);
 
-      renderDayList(19);
-      renderSessionDetailsPages();
+      var dates = [jmoment([2013,8,19]), jmoment([2013,8,20]), jmoment([2013,8,21])];
+      var today = jmoment();
+      var target;
+      if (today.unix() < dates[1].unix()) {
+        target = dates[0];
+      } else if (target.unix() >= dates[2].unix()) {
+        target = dates[2];
+      } else {
+        target = dates[1];
+      }
 
+      $(".day-" + target.date()).addClass("ui-btn-active");
+
+      renderDayList(target.date());
+      renderSessionDetailsPages();
 
       $(document).on('click', '.star-btn', function(e){
         e.preventDefault();
