@@ -8,7 +8,7 @@ GEM
       coderay (~> 1.0.5)
       method_source (~> 0.8)
       slop (~> 3.4)
-    rake (10.0.4)
+    rake (10.1.0)
     redcarpet (3.0.0)
     slop (3.4.4)
 
@@ -18,5 +18,5 @@ PLATFORMS
 DEPENDENCIES
   oj (= 2.0.9)
   pry (= 0.9.12)
-  rake (= 10.0.4)
+  rake
   redcarpet (= 3.0.0)
