@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html manifest="yapcasia2013.appcache">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YAPC::Asia</title>
+  <link rel="stylesheet" href="jquery.mobile.custom.structure.min.css">
+  <link rel="stylesheet" href="jquery.mobile.custom.theme.min.css">
+  <link rel="stylesheet" href="custom.css">
+  <link rel="apple-touch-icon-precomposed" href="apple-touch-icon.png">
+</head>
+<body>
+  <div data-role="page" id="home">
+    <div data-role="header" data-id="main-nav" data-position="fixed">
+      <h1>YAPC::Asia</h1>
+    </div>
+    <div data-role="header">
+      <div data-role="navbar" style="overflow:hidden;">
+        <ul>
+          <li><a href="#" class="day-19" onClick="renderDayList(19);">Thu 9/19</a></li>
+          <li><a href="#" class="day-20" onClick="renderDayList(20);">Fri 9/20</a></li>
+          <li><a href="#" class="day-21" onClick="renderDayList(21);">Sat 9/21</a></li>
+        </ul>
+      </div>
+    </div>
+    <div data-role="content">
+      <ul id="talks" data-role="listview" data-split-theme="c" data-split-icon="star">
+      </ul>
+    </div>
+    <div data-role="footer" class="our-footer">
+      <a href="https://github.com/miyagawa/yapcasia2013" target="_blank">
+        Based on Railsconf offline calendar by Caliper.io
+      </a>
+    </div>
+  </div>
+
+  <script id="talk-divider-template" type="text/x-handlebars-template">
+    <li data-role="list-divider">{{ starting_at }} - {{ ending_at }}</li>
+  </script>
+
+  <script id="entry-list-template" type="text/x-handlebars-template">
+    <li data-talk-id="{{ uid }}" class="{{#if stared}}stared{{/if}} list-row">
+      <a class="session-show" href="#{{ uid }}">
+        <h2 class="session-title">{{ title }}</h2>
+        <p class="session-speaker">{{ speaker.name }}</p>
+        <p class="session-venue">Venue: {{ location }}</p>
+        <p class="session-venue ui-li-aside">{{ location }}</p>
+      </a>
+      <a href="#" class="ui-icon-alt star-btn"></a>
+    </li>
+  </script>
+
+  <script id="session-details-template" type="text/x-handlebars-template">
+    <div data-role="page" id="{{ talk.uid }}" class="session-page">
+      <div data-role="header" data-id="main-nav" data-position="fixed" style="overflow:hidden;">
+        <a data-role="button" data-theme="a" data-rel="back" href="#home" data-icon="arrow-l" class="ui-btn-left">Back</a>
+        <h1>YAPC::Asia</h1>
+      </div>
+      <div data-role="content">
+        <h4>{{starting_at}} - {{ending_at}}</h4>
+        <h2>{{talk.title}}</h2>
+        <h6>Venue: {{ talk.location }}</h6>
+        <p><strong>{{ talk.speaker.name }}</strong></p>
+
+        <div>
+          {{{ talk.description  }}}
+        </div>
+
+        <!-- div>
+          <h3>About the speaker</h3>
+          {{{ talk.speaker.description }}}
+        </div -->
+      </div>
+      <div data-role="footer" class="our-footer">
+        <a href="https://github.com/miyagawa/yapcasia2013" target="_blank">
+          Based on Railsconf offline calendar by Caliper.io
+        </a>
+      </div>
+    </div>
+  </script>
+
+  <script src="jquery-1.9.1.min.js"></script>
+  <script src="jquery.mobile.custom.min.js"></script>
+  <script src="handlebars-1.0.0.rc.2.js"></script>
+  <script src="fastclick.min.js"></script>
+  <script src="moment.min.js"></script>
+  <script src="moment-timezone.min.js"></script>
+  <script src="data/schedule.js"></script>
+
+  <script type="text/javascript">
+    moment.tz.add({
+      "zones": {
+          "Asia/Tokyo": [
+              "9:18:59 - LMT 1887_11_31_15",
+              "9 - JST 1896 9",
+              "9 - CJT 1938 9",
+              "9 Japan J%sT"
+          ]
+      },
+      "rules": {
+          "Japan": [
+              "1948 1948 4 1 0 2 0 1 D",
+              "1948 1951 8 8 6 2 0 0 S",
+              "1949 1949 3 1 0 2 0 1 D",
+              "1950 1951 4 1 0 2 0 1 D"
+          ]
+      },
+      "links": {}
+    });
+
+    var entryListTemplate = Handlebars.compile($("#entry-list-template").html());
+    var talkDividerExample = Handlebars.compile($("#talk-divider-template").html());
+    var sessionDetailsTemplate = Handlebars.compile($("#session-details-template").html());
+
+    var getStared = function(){
+      if(typeof window._stared === 'undefined'){
+        window._stared = {};
+
+        if(window.localStorage){
+          var s = (window.localStorage.getItem('stared') || '').split(',');
+
+          for(var i=0;i<s.length;i++){
+            if(s[i].length){
+              window._stared[s[i]] = true;
+            }
+          }
+        }
+      }
+
+      return window._stared;
+    };
+
+    var saveStared = function(){
+      if(typeof window._stared === 'object' && window.localStorage){
+        var s = [];
+
+        for(var item in window._stared){
+          if(window._stared.hasOwnProperty(item) && window._stared[item]){
+            s.push(item);
+          }
+        }
+
+        window.localStorage.setItem('stared', s.join(','));
+      }
+    };
+
+    var star = function(item){
+      getStared();
+      _stared[String(item)] = true;
+      saveStared();
+    };
+
+    var unstar = function(item){
+      getStared();
+      _stared[String(item)] = false;
+      saveStared();
+    };
+
+    var jmoment = function(s){
+      return moment(s).tz("Asia/Tokyo");
+    };
+
+    var renderDayList = function(day) {
+      $("#talks").empty();
+
+      var timerange;
+
+      $.each(schedule, function(i, obj) {
+        obj.stared = getStared()[obj.uid];
+
+        // only draw those for the selected date (Day)
+        var s = jmoment(obj.starting_at);
+        if (s.date() != day) {
+          return true;
+        }
+        // check if we need a time divider
+        if (timerange == undefined || timerange != obj.starting_at + obj.ending_at) {
+          var e = jmoment(obj.ending_at);
+          $("#talks").append(talkDividerExample({
+            starting_at: s.format('HH:mm'),
+            ending_at: e.format('HH:mm')
+          }));
+          timerange = obj.starting_at + obj.ending_at;
+        }
+        // Add talk information
+        $("#talks").append(entryListTemplate(obj));
+      });
+      $("#talks").listview('refresh');
+    };
+
+    var renderSessionDetailsPages = function() {
+      $.each(schedule, function(i, talk) {
+        var s = jmoment(talk.starting_at);
+        var e = jmoment(talk.ending_at);
+        var toRender = sessionDetailsTemplate({
+            starting_at: s.format('HH:mm'),
+            ending_at: e.format('HH:mm'),
+            talk: talk
+          });
+
+        $("body").append(toRender);
+      });
+    };
+
+    $(document).ready(function() {
+      new FastClick(document.body);
+
+      var dates = [jmoment([2013,8,19]), jmoment([2013,8,20]), jmoment([2013,8,21])];
+      var today = jmoment();
+      var target;
+      if (today.unix() < dates[1].unix()) {
+        target = dates[0];
+      } else if (target.unix() >= dates[2].unix()) {
+        target = dates[2];
+      } else {
+        target = dates[1];
+      }
+
+      $(".day-" + target.date()).addClass("ui-btn-active");
+
+      renderDayList(target.date());
+      renderSessionDetailsPages();
+
+      $(document).on('click', '.star-btn', function(e){
+        e.preventDefault();
+
+        var $li = $(this).parent();
+
+        var talk_id = $li.data('talk-id');
+
+        if(getStared()[talk_id]){
+          unstar(talk_id);
+          $li.removeClass('stared');
+        }else{
+          star(talk_id);
+          $li.addClass('stared');
+        }
+
+        return false;
+      });
+
+    });
+  </script>
+</body>
+</html>
